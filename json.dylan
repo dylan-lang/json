@@ -2,9 +2,18 @@ module: json
 
 define generic encode-json (stream :: <stream>, object :: <object>);
 
+define constant $escapes = 
+  vector(pair("\\", "\\\\"),
+         pair("\"", "\\\""),
+         pair("\n", "\\n"),
+         pair("\t", "\\t"));
+
 define method encode-json (stream :: <stream>, object :: <string>)
   write(stream, "\"");
-  write(stream, substring-replace(object, "\"", "\\\""));
+  for (escape in $escapes)
+    object := substring-replace(object, head(escape), tail(escape));
+  end for;
+  write(stream, object);
   write(stream, "\"");
 end;
 
