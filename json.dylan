@@ -25,6 +25,12 @@ define method encode-json (stream :: <stream>, object :: <float>)
   format(stream, "%f", object);
 end;
 
+define method encode-json (stream :: <stream>, object :: <symbol>)
+  write(stream, "\"");
+  write(stream, as(<string>, object));
+  write(stream, "\"");
+end;
+
 define method encode-json (stream :: <stream>, object :: singleton(#f))
   write(stream, "false");
 end;
