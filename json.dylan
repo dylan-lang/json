@@ -22,7 +22,7 @@ define method encode-json (stream :: <stream>, object :: <integer>)
 end;
 
 define method encode-json (stream :: <stream>, object :: <float>)
-  format(stream, "%f", object);
+  write(stream, float-to-string(object));
 end;
 
 define method encode-json (stream :: <stream>, object :: <symbol>)
