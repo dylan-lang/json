@@ -1,18 +1,23 @@
 module: dylan-user
 
 define library json
-  use dylan;
   use common-dylan;
   use io;
-  use string-extensions;
+  use strings;
   export json;
 end;
 
 define module json
-  use dylan;
+  create
+    encode-json,
+    parse-json,
+    <json-error>,
+    $null;
+end;
+
+define module %json
+  use common-dylan;
+  use json;
   use streams;
-  use common-extensions;
-  use substring-search;
-  use format;
-  export encode-json;
+  use strings;
 end;
