@@ -6,6 +6,7 @@ License: See License.txt in this distribution for details.
 
 
 define library json-test-suite
+  use collections;
   use common-dylan;
   use json;
   use system,
@@ -15,7 +16,11 @@ end;
 
 define module json-test-suite
   use common-dylan;
-  use json;
+  use table-extensions,
+    import: {},
+    rename: { table => make-table };
+  use json,
+    import: { parse-json, $null };
   use locators,
     import: { <file-locator>,
               locator-name };

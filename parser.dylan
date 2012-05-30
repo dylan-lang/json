@@ -49,47 +49,6 @@ define method parse-json
 end;
 
 
-/// Synopsis: Parse a JSON "object", i.e. hash table
-///
-define method parse-object
-    (p :: <json-parser>) => (object :: <json-object>)
-  let object = make(<json-object>);
-  eat-whitespace-and-comments(p);
-  select (p.next)
-    '{' =>
-      p.consume;
-      parse-members(p, object);
-      expect(p, "}");
-    otherwise =>
-      parse-error(p, "Invalid object.  Expected '{'.");
-  end;
-  object
-end method parse-object;
-
-
-/// Synopsis: Parse the members of an object and add them to the 'object'
-///           argument passed in.
-define method parse-members
-    (p :: <json-parser>, object :: <json-object>) => ()
-  iterate loop ()
-    eat-whitespace-and-comments(p);
-    select (p.next)
-      '}', #f =>
-        #f;  // done
-      '"' =>
-        let key = parse-string(p);
-        // empty strings are a hack to eat whitespace.
-        expect(p, "", ":", "");
-        let value = parse-any(p);
-        object[key] := value;
-        loop();
-      otherwise =>
-        parse-error(p, "Expected '\"' or '}'.");
-    end;
-  end iterate;
-end method parse-members;
-
-
 /// Synopsis: parse and return any valid json entity.  An object, array,
 ///           integer, float, string, boolean, or null.  This is used for
 ///           parsing list elements and member values, for example.
@@ -123,6 +82,51 @@ define method parse-any
       parse-error(p, "Unexpected input starting with %=.", char);
   end select
 end method parse-any;
+
+
+/// Synopsis: Parse a JSON "object", i.e. hash table
+///
+define method parse-object
+    (p :: <json-parser>) => (object :: <json-object>)
+  let object = make(<json-object>);
+  eat-whitespace-and-comments(p);
+  select (p.next)
+    '{' =>
+      p.consume;
+      parse-members(p, object);
+      expect(p, "}");
+    otherwise =>
+      parse-error(p, "Invalid object.  Expected '{'.");
+  end;
+  object
+end method parse-object;
+
+
+/// Synopsis: Parse the members of an object and add them to the 'object'
+///           argument passed in.
+define method parse-members
+    (p :: <json-parser>, object :: <json-object>) => ()
+  iterate loop ()
+    eat-whitespace-and-comments(p);
+    select (p.next)
+      '}', #f =>
+        #f;  // done
+      '"' =>
+        let key = parse-string(p);
+        // empty strings are a hack to eat whitespace.
+        expect(p, "", ":", "");
+        let value = parse-any(p);
+        object[key] := value;
+        eat-whitespace-and-comments(p);
+        if (p.next = ',')
+          p.consume;
+        end;
+        loop();
+      otherwise =>
+        parse-error(p, "Expected '\"' or '}'.");
+    end;
+  end iterate;
+end method parse-members;
 
 
 define method eat-whitespace-and-comments
@@ -255,10 +259,12 @@ define method parse-simple-string
                    else
                      element($escape-chars, char, default: #f)
                    end;
-      if (p.strict? & ~actual)
-        parse-error(p, "Invalid character escape sequence: \\%c", char);
-      else
-        actual := char;
+      if (~actual)
+        if (p.strict?)
+          parse-error(p, "Invalid character escape sequence: \\%c", char);
+        else
+          actual := char;
+        end;
       end;
       add!(chars, actual);
       loop(#f)
