@@ -188,38 +188,61 @@ end function parse-array-elements;
 
 /// Synopsis: Parse an integer or float (digits on both sides of the '.' required)
 ///
-// TODO(cgay): This doesn't parse floats correctly.
 define method parse-number
-    (p :: <json-parser>)
- => (number :: <number>)
+    (p :: <json-parser>) => (number :: <number>)
+  local method expect-digit () => (digit :: <character>)
+          if (decimal-digit?(p.next))
+            p.next
+          else
+            parse-error(p, "Invalid number: Digit expected but got %=", p.next);
+          end
+        end;
   let chars = make(<stretchy-vector>);
   if (p.next = '-')
     add!(chars, p.consume);
   end;
-  if (~decimal-digit?(p.next))
-    parse-error(p, "Invalid number: Digit expected but got %=", p.next);
-  end;
+  expect-digit();
+  let dot? = #f;
+  let exp? = #f;
   iterate loop ()
     let char = p.next;
-    if (~char)
-      #f
-    elseif (decimal-digit?(char))
-      p.consume;
-      add!(chars, char);
-      loop();
-    elseif (char = '.')
-      if (member?('.', chars))
-        parse-error(p, "Invalid float: '.' already seen.");
-      end;
-      p.consume;
-      add!(chars, char);
-      loop();
-    elseif (~member?(char, $token-terminators))
-      parse-error(p, "Invalid number: %c unexpected", char);
+    case
+      ~char | member?(char, $token-terminators) =>
+        #f;
+      decimal-digit?(char) =>
+        p.consume;
+        add!(chars, char);
+        loop();
+      char = '.' =>
+        if (exp?)
+          parse-error(p, "Invalid float: 'e' already seen.");
+        end;
+        if (dot?)
+          parse-error(p, "Invalid float: '.' already seen.");
+        end;
+        dot? := #t;
+        p.consume;
+        add!(chars, char);
+        loop();
+      as-lowercase(char) = 'e' =>
+        if (exp?)
+          parse-error(p, "Invalid float: 'e' already seen.");
+        end;
+        exp? := #t;
+        p.consume;
+        add!(chars, char);
+        if (p.next = '-')
+          add!(chars, p.consume);
+        elseif (p.next = '+')
+          p.consume;
+        end;
+        loop();
+      otherwise =>
+        parse-error(p, "Invalid number: '%c' unexpected", char);
     end;
   end;
   let string = map-as(<string>, identity, chars);
-  if (member?('.', string))
+  if (dot? | exp?)
     string-to-float(string)
   else
     string-to-integer(string)
@@ -434,3 +457,65 @@ define method expect
 end method expect;
 
 
+// TODO(cgay): Temporary!  No, really!  Copied here from uncommon-dylan.
+// All the number <-> string conversions should be in the strings library.
+define method string-to-float(s :: <string>) => (f :: <float>)
+  local method is-digit?(ch :: <character>) => (b :: <boolean>)
+    let v = as(<integer>, ch);
+    v >= as(<integer>, '0') & v <= as(<integer>, '9');
+  end method;
+  let lhs = make(<stretchy-vector>);
+  let rhs = make(<stretchy-vector>);
+  let state = #"start";
+  let sign = 1;
+
+  local method process-char(ch :: <character>)
+    select(state)
+      #"start" =>
+        select(ch)
+          '-' => 
+            begin
+              sign := -1;
+              state := #"lhs";
+            end;
+          '+' =>
+            begin
+              sign := 1;
+              state := #"lhs";
+            end;
+          '.' =>
+            begin
+              lhs := add!(lhs, '0');
+              state := #"rhs";
+            end;
+          otherwise =>
+            begin
+              state := #"lhs";
+              process-char(ch);
+            end;
+        end select;
+      #"lhs" => 
+        case
+          is-digit?(ch) => lhs := add!(lhs, ch);
+          ch == '.' => state := #"rhs";
+          otherwise => error("Invalid floating point value.");
+        end case;
+      #"rhs" =>
+        case
+          is-digit?(ch) => rhs := add!(rhs, ch);
+          otherwise => error("Invalid floating point value.");
+        end case;
+      otherwise => error("Invalid state while parsing floating point.");
+    end select;
+  end method;
+
+  for(ch in s)
+    process-char(ch);
+  end for;
+
+  let lhs = as(<string>, lhs);
+  let rhs = if(empty?(rhs)) "0" else as(<string>, rhs) end;
+  (string-to-integer(lhs) * sign)
+   + as(<double-float>, string-to-integer(rhs) * sign)
+     / (10 ^ min(rhs.size, 7)); 
+end method string-to-float;
