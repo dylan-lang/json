@@ -1,7 +1,7 @@
-module: json
-Copyright:    Original Code is Copyright (c) 2011 Dylan Hackers
-              All rights reserved.
-License:      See License.txt in this distribution for details.
+Module: %json
+Copyright: Original Code is Copyright (c) 2011 Dylan Hackers
+           All rights reserved.
+License: See License.txt in this distribution for details.
 
 define generic encode-json (stream :: <stream>, object :: <object>);
 
@@ -14,14 +14,14 @@ define constant $escapes =
 define method encode-json (stream :: <stream>, object :: <string>)
   write(stream, "\"");
   for (escape in $escapes)
-    object := substring-replace(object, head(escape), tail(escape));
+    object := replace-substrings(object, head(escape), tail(escape));
   end for;
   write(stream, object);
   write(stream, "\"");
 end;
 
 define method encode-json (stream :: <stream>, object :: <integer>)
-  format(stream, "%d", object);
+  write(stream, integer-to-string(object));
 end;
 
 define method encode-json (stream :: <stream>, object :: <float>)
