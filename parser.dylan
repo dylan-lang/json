@@ -7,22 +7,20 @@ License:   See LICENSE.txt in this distribution for details.
 
 // Notes:
 // * Objects are parsed as <string-table>s.
+// * The parser is strict by default.  If ``strict?: #f`` is used then
+//   - '#' is allowed as a comment character
+//   - "\<c>" is equivalent to "<c>", where <c> is not a defined escape character
+//   - trailing commas are allowed in arrays and objects.
 
 // TODO(cgay):
-// * parse exponents
-// * Is spec specific about whitespace handling?  e.g., is "true123" a bool
-//   and an int, or an error?  What about 123{} ?
-
+// * parse-number
 
 
 define constant <json-object> = <string-table>;
 
-define constant $whitespace :: <string>
-  = " \t\n\r";
-
-// Things that terminate numbers and booleans
-define constant $token-terminators :: <string>
-  = concatenate($whitespace, "{}[]\"");
+// Things that terminate numbers, booleans, and null.  Note that ':' is not
+// included since it may only follow a double quote character.
+define constant $token-terminators :: <string> = " \t\n\r}],";
 
 
 
@@ -33,7 +31,7 @@ define open generic parse-json
  => (json :: <object>);
 
 define method parse-json
-    (source :: <stream>, #key strict? :: <boolean>) => (json :: <object>)
+    (source :: <stream>, #key strict? :: <boolean> = #t) => (json :: <object>)
   parse-any(make(<json-parser>,
                  source: source,
                  text: read-to-end(source),
@@ -41,7 +39,7 @@ define method parse-json
 end;
 
 define method parse-json
-    (source :: <string>, #key strict? :: <boolean>) => (json :: <object>)
+    (source :: <string>, #key strict? :: <boolean> = #t) => (json :: <object>)
   parse-any(make(<json-parser>,
                  source: source,
                  text: source,
@@ -52,8 +50,6 @@ end;
 /// Synopsis: parse and return any valid json entity.  An object, array,
 ///           integer, float, string, boolean, or null.  This is used for
 ///           parsing list elements and member values, for example.
-/// Arguments:
-///   p   - Json parser.
 ///
 define method parse-any
     (p :: <json-parser>) => (object :: <object>)
@@ -68,24 +64,29 @@ define method parse-any
       parse-array(p);
     "-0123456789" =>
       parse-number(p);
-    // TODO(cgay): validate that the next char is a token delimeter
     "t" =>
       expect(p, "true");
+      expect-token-terminator(p);
       #t;
     "f" =>
       expect(p, "false");
+      expect-token-terminator(p);
       #f;
     "n" =>
       expect(p, "null");
+      expect-token-terminator(p);
       $null;
     otherwise =>
-      parse-error(p, "Unexpected input starting with %=.", char);
+      parse-error(p, "Unexpected input starting with %=:", char);
   end select
 end method parse-any;
 
 
-/// Synopsis: Parse a JSON "object", i.e. hash table
-///
+/// Synopsis: Parse a JSON "object", which we represent as a <string-table>.
+/// 
+/// Note: The spec says the keys SHOULD be unique.  We could represent
+/// this as a <property-list> and allow duplicate keys.  Python's json
+/// module uses a dict, so at least we're in reasonable company.
 define method parse-object
     (p :: <json-parser>) => (object :: <json-object>)
   let object = make(<json-object>);
@@ -109,8 +110,8 @@ define method parse-members
   iterate loop ()
     eat-whitespace-and-comments(p);
     select (p.next)
-      '}', #f =>
-        #f;  // done
+      #f => parse-error(p, "End of input");
+      '}' => #f;
       '"' =>
         let key = parse-string(p);
         // empty strings are a hack to eat whitespace.
@@ -118,10 +119,18 @@ define method parse-members
         let value = parse-any(p);
         object[key] := value;
         eat-whitespace-and-comments(p);
-        if (p.next = ',')
-          p.consume;
+        select (p.next)
+          ',' =>
+            p.consume;
+            eat-whitespace-and-comments(p);
+            if (p.next == '}' & p.strict?)
+              parse-error(p, "Trailing comma not allowed in object.")
+            end;
+            loop();
+          '}' => #f;
+          otherwise =>
+            parse-error(p, "Unexpected data");
         end;
-        loop();
       otherwise =>
         parse-error(p, "Expected '\"' or '}'.");
     end;
@@ -135,9 +144,12 @@ define method eat-whitespace-and-comments
     if (~p.strict? & (p.next = '#'))
       eat-comment(p);
       loop()
-    elseif (p.next & whitespace?(p.next))
-      p.consume;
-      loop()
+    else
+      let char = p.next;
+      if (char == ' ' | char == '\t' | char == '\r' | char == '\n')
+        p.consume;
+        loop()
+      end;
     end;
   end;
 end;
@@ -166,9 +178,6 @@ end method eat-comment;
 define method parse-array
     (p :: <json-parser>) => (array :: <vector>)
   let array = make(<stretchy-vector>);
-  if (p.next ~= '[')
-    parse-error(p, "Array expected");
-  end;
   p.consume;  // '['
   parse-array-elements(p, array);
   expect(p, "]");
@@ -179,22 +188,38 @@ define function parse-array-elements
     (p :: <json-parser>, array :: <stretchy-vector>) => ()
   iterate loop ()
     eat-whitespace-and-comments(p);
-    if (p.next & (p.next ~= ']'))
-      add!(array, parse-any(p));
-      loop()
-    end
+    select (p.next)
+      #f => parse-error(p, "End of input");
+      ']' => #f;
+      otherwise =>
+        add!(array, parse-any(p));
+        eat-whitespace-and-comments(p);
+        select (p.next)
+          ',' =>
+            p.consume;
+            eat-whitespace-and-comments(p);
+            if (p.next == ']' & p.strict?)
+              parse-error(p, "Trailing comma not allowed in array.")
+            end;
+            loop();
+          ']' => #f;
+          otherwise =>
+            parse-error(p, "Unexpected data");
+        end;
+    end;
   end;
 end function parse-array-elements;
 
 /// Synopsis: Parse an integer or float (digits on both sides of the '.' required)
 ///
+/// TODO(cgay): Leading zeros not allowed (in strict mode).
 define method parse-number
     (p :: <json-parser>) => (number :: <number>)
   local method expect-digit () => (digit :: <character>)
           if (decimal-digit?(p.next))
             p.next
           else
-            parse-error(p, "Invalid number: Digit expected but got %=", p.next);
+            parse-error(p, "Invalid number: Decimal digit expected but got %=", p.next);
           end
         end;
   let chars = make(<stretchy-vector>);
@@ -322,7 +347,7 @@ define function parse-unicode-escape
           elseif (member?(char, "abcdef"))
             as(<integer>, char) - as(<integer>, 'a') + 10
           else
-            parse-error(p, "Hex digit expected for unicode escape");
+            parse-error(p, "Hexadecimal digit expected for unicode escape");
           end
         end;
   let c1 = getchar();
@@ -456,9 +481,17 @@ define method expect
   end;
 end method expect;
 
+define function expect-token-terminator
+    (p :: <json-parser>) => ()
+  let char = p.next;
+  if (char & ~member?(char, $token-terminators))
+    parse-error(p, "Token terminator (%=) or whitespace expected.",
+                $token-terminators);
+  end;
+end function expect-token-terminator;
 
 // TODO(cgay): Temporary!  No, really!  Copied here from uncommon-dylan.
-// All the number <-> string conversions should be in the strings library.
+// All the number <-> string conversions should be in the common-dylan library.
 define method string-to-float(s :: <string>) => (f :: <float>)
   local method is-digit?(ch :: <character>) => (b :: <boolean>)
     let v = as(<integer>, ch);

@@ -19,8 +19,7 @@ define module json-test-suite
   use table-extensions,
     import: {},
     rename: { table => make-table };
-  use json,
-    import: { parse-json, $null };
+  use json;
   use locators,
     import: { <file-locator>,
               locator-name };

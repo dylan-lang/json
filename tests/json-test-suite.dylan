@@ -38,10 +38,21 @@ define test test-parse-object ()
   check-equal("b", parse-json("{\"a\": 1}"), make-object("a" => 1));
   check-equal("c", parse-json("{\"a\": true,\"b\": false, \"c\": null}"),
               make-object("a" => #t, "b" => #f, "c" => $null));
+  check-equal("Trailing comma allowed in non-strict mode?",
+              parse-json("{\"a\": true,}", strict?: #f),
+              make-object("a" => #t));
+  check-condition("Trailing comma allowed in non-strict mode?",
+                  <json-error>, parse-json("{\"a\": true,}"));
 end test test-parse-object;
 
 define test test-parse-array ()
   check-equal("a", parse-json("[]"), #[]);
+  check-equal("b", parse-json("[null,true,false]"), vector($null, #t, #f));
+  check-equal("Trailing comma allowed in non-strict mode?",
+              parse-json("[null,]", strict?: #f),
+              vector($null));
+  check-condition("Trailing comma disallowed in strict mode?",
+                  <json-error>, parse-json("[null,true,false,]"))
 end test test-parse-array;
 
 define test test-parse-string ()
@@ -75,6 +86,7 @@ define test test-parse-constants ()
   check-equal("a", parse-json("null"), $null);
   check-equal("b", parse-json("true"), #t);
   check-equal("c", parse-json("false"), #f);
+  check-condition("d", <json-error>, parse-json("null123"));
 end test test-parse-constants;
 
 /// Synopsis: Verify that whitespace (including CR, CRLF, and LF) is ignored.
