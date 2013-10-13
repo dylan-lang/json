@@ -365,7 +365,7 @@ define constant $null :: <null> = make(<null>);
 
 define class <json-parser> (<object>)
   // Source is for error reporting only.  It could be a file name, a stream, etc.
-  constant slot input-source :: <object>, required-init-keyword: source:;
+  //constant slot input-source :: <object>, required-init-keyword: source:;
 
   // Text is the entire original source text.
   // TODO(cgay): Support streams better.  Probably make stream optional and use
