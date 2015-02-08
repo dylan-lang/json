@@ -20,4 +20,6 @@ define module %json
   use json;
   use streams;
   use strings;
+  use format,
+    import: { format-to-string };
 end;
