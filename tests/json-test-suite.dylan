@@ -7,31 +7,11 @@ License: See License.txt in this distribution for details.
 
 // TODO(cgay): intentional parse errors.
 
-define function main ()
-  let filename = locator-name(as(<file-locator>, application-name()));
-  if (split(filename, ".")[0] = "json-test-suite")
-    run-test-application(json-test-suite);
-  end;
-end function main;
-
 define macro make-object
     { make-object(?rest:*) }
  => { make-table(<string-table>, ?rest); }
 end;
 
-
-define suite json-test-suite ()
-  suite parser-test-suite;
-end suite json-test-suite;
-
-define suite parser-test-suite ()
-  test test-parse-object;
-  test test-parse-array;
-  test test-parse-string;
-  test test-parse-number;
-  test test-parse-constants;
-  test test-parse-whitespace;
-end suite parser-test-suite;
 
 define test test-parse-object ()
   check-equal("a", parse-json("{}"), make-object());
@@ -97,5 +77,24 @@ define test test-parse-whitespace ()
   check-equal("a", parse-json(" {\n\"key\"\r:\r\n123\r }"), obj);
 end test test-parse-whitespace;
 
+define suite parser-test-suite ()
+  test test-parse-object;
+  test test-parse-array;
+  test test-parse-string;
+  test test-parse-number;
+  test test-parse-constants;
+  test test-parse-whitespace;
+end suite parser-test-suite;
+
+define suite json-test-suite ()
+  suite parser-test-suite;
+end suite json-test-suite;
+
+define function main ()
+  let filename = locator-name(as(<file-locator>, application-name()));
+  if (split(filename, ".")[0] = "json-test-suite")
+    run-test-application(json-test-suite);
+  end;
+end function main;
 
 main();
