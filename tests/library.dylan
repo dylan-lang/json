@@ -9,6 +9,7 @@ define library json-test-suite
   use collections;
   use common-dylan;
   use json;
+  use io;
   use system,
     import: { locators };
   use testworks;
@@ -20,6 +21,7 @@ define module json-test-suite
     import: {},
     rename: { table => make-table };
   use json;
+  use format;
   use locators,
     import: { <file-locator>,
               locator-name };
