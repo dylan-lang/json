@@ -16,8 +16,6 @@ License:   See LICENSE.txt in this distribution for details.
 // * parse-number
 
 
-define constant <json-object> = <string-table>;
-
 // Things that terminate numbers, booleans, and null.  Note that ':' is not
 // included since it may only follow a double quote character.
 define constant $token-terminators :: <string> = " \t\n\r}],";
@@ -26,24 +24,30 @@ define constant $token-terminators :: <string> = " \t\n\r}],";
 
 /// Synopsis: Parse json formatted text from the given 'source'.
 ///           This is the main user-visible entry point for parsing.
+///           table-class, if provided, should be a subclass of <table>
+///           to use when creating a JSON "object".
 define open generic parse-json
-    (source :: <object>, #key strict? :: <boolean>)
+    (source :: <object>, #key strict? :: <boolean>, table-class = <string-table>)
  => (json :: <object>);
 
 define method parse-json
-    (source :: <stream>, #key strict? :: <boolean> = #t) => (json :: <object>)
+    (source :: <stream>, #key strict? :: <boolean> = #t, table-class)
+ => (json :: <object>)
   parse-any(make(<json-parser>,
                  source: source,
                  text: read-to-end(source),
-                 strict?: strict?))
+                 strict?: strict?,
+                 table-class: table-class | <string-table>))
 end;
 
 define method parse-json
-    (source :: <string>, #key strict? :: <boolean> = #t) => (json :: <object>)
+    (source :: <string>, #key strict? :: <boolean> = #t, table-class = <string-table>)
+ => (json :: <object>)
   parse-any(make(<json-parser>,
                  source: source,
                  text: source,
-                 strict?: strict?))
+                 strict?: strict?,
+                 table-class: table-class | <string-table>))
 end;
 
 
@@ -82,14 +86,14 @@ define method parse-any
 end method parse-any;
 
 
-/// Synopsis: Parse a JSON "object", which we represent as a <string-table>.
+/// Synopsis: Parse a JSON "object", which we represent as a <table>.
 /// 
 /// Note: The spec says the keys SHOULD be unique.  We could represent
 /// this as a <property-list> and allow duplicate keys.  Python's json
 /// module uses a dict, so at least we're in reasonable company.
 define method parse-object
-    (p :: <json-parser>) => (object :: <json-object>)
-  let object = make(<json-object>);
+    (p :: <json-parser>) => (object :: <table>)
+  let object = make(p.table-class);
   eat-whitespace-and-comments(p);
   select (p.next)
     '{' =>
@@ -106,7 +110,7 @@ end method parse-object;
 /// Synopsis: Parse the members of an object and add them to the 'object'
 ///           argument passed in.
 define method parse-members
-    (p :: <json-parser>, object :: <json-object>) => ()
+    (p :: <json-parser>, object :: <table>) => ()
   iterate loop ()
     eat-whitespace-and-comments(p);
     select (p.next)
@@ -382,6 +386,9 @@ define class <json-parser> (<object>)
   // If true, do not allow comments or illegal escape characters in strings.
   constant slot strict? :: <boolean> = #t,
     init-keyword: strict?:;
+
+  constant slot table-class :: subclass(<table>) = <string-table>,
+    init-keyword: table-class:;
 end class <json-parser>;
 
 
