@@ -80,6 +80,12 @@ define test test-parse-whitespace ()
   check-equal("a", parse-json(" {\n\"key\"\r:\r\n123\r }"), obj);
 end test test-parse-whitespace;
 
+define test test-table-class ()
+  assert-equal(2, size(parse-json(#raw:({"a": 1, "A": 2}))));
+  assert-equal(1, size(parse-json(#raw:({"a": 1, "A": 2}),
+                                  table-class: <istring-table>)));
+end;
+
 define suite parser-test-suite ()
   test test-parse-object;
   test test-parse-array;
@@ -87,6 +93,7 @@ define suite parser-test-suite ()
   test test-parse-number;
   test test-parse-constants;
   test test-parse-whitespace;
+  test test-table-class;
 end suite parser-test-suite;
 
 define suite json-test-suite ()
