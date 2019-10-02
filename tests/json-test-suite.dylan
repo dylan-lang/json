@@ -85,24 +85,11 @@ define test test-table-class ()
                                   table-class: <istring-table>)));
 end;
 
-define suite parser-test-suite ()
-  test test-parse-object;
-  test test-parse-array;
-  test test-parse-string;
-  test test-parse-number;
-  test test-parse-constants;
-  test test-parse-whitespace;
-  test test-table-class;
-end suite parser-test-suite;
-
-define suite json-test-suite ()
-  suite parser-test-suite;
-end suite json-test-suite;
 
 define function main ()
   let filename = locator-name(as(<file-locator>, application-name()));
   if (split(filename, ".")[0] = "json-test-suite")
-    run-test-application(json-test-suite);
+    run-test-application();
   end;
 end function main;
 
