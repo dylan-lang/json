@@ -84,13 +84,3 @@ define test test-table-class ()
   assert-equal(1, size(parse-json(#:raw:({"a": 1, "A": 2}),
                                   table-class: <istring-table>)));
 end;
-
-
-define function main ()
-  let filename = locator-name(as(<file-locator>, application-name()));
-  if (split(filename, ".")[0] = "json-test-suite")
-    run-test-application();
-  end;
-end function main;
-
-main();
