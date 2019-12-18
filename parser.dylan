@@ -5,15 +5,12 @@ License:   See LICENSE.txt in this distribution for details.
 
 
 // Notes:
+// * Bug list: https://github.com/dylan-lang/json/issues
 // * Objects are parsed as <string-table>s by default.
 // * The parser is strict by default.  If ``strict?: #f`` is used then
 //   - '#' is allowed as a comment character
 //   - "\<c>" is equivalent to "<c>", where <c> is not a defined escape character
 //   - trailing commas are allowed in arrays and objects.
-
-// TODO(cgay):
-// * parse-number
-
 
 // Things that terminate numbers, booleans, and null.  Note that ':' is not
 // included since it may only follow a double quote character.
@@ -21,10 +18,9 @@ define constant $token-terminators :: <string> = " \t\n\r}],";
 
 
 
-/// Synopsis: Parse json formatted text from the given 'source'.
-///           This is the main user-visible entry point for parsing.
-///           table-class, if provided, should be a subclass of <table>
-///           to use when creating a JSON "object".
+// Parse json formatted text from the given 'source'.  This is the main
+// user-visible entry point for parsing.  table-class, if provided, should be a
+// subclass of <table> to use when creating a json "object".
 define open generic parse-json
     (source :: <object>, #key strict? :: <boolean>, table-class = <string-table>)
  => (json :: <object>);

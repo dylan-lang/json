@@ -4,22 +4,35 @@ define library json
   use common-dylan;
   use io;
   use strings;
+
   export json;
 end;
 
 define module json
   create
-    encode-json,
-    parse-json,
     <json-error>,
+
+    parse-json,
+
+    print,                      // call this
+    print-json,                 // implement this
+
     $null;
 end;
 
 define module %json
   use common-dylan;
-  use json;
-  use streams;
-  use strings;
   use format,
-    import: { format-to-string };
+    import: { format, format-to-string };
+  use json;
+  use pprint,
+    prefix: "io/",
+    import: { printing-logical-block, pprint-indent, pprint-newline };
+  use print,
+    import: { *print-pretty?* };
+  use streams;
+  use strings,
+    import: { decimal-digit?, replace-substrings };
+  use threads,
+    import: { dynamic-bind };
 end;
