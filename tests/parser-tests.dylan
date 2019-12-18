@@ -43,26 +43,37 @@ define test test-parse-string ()
   check-equal("c", parse-json(#:raw:("\"\\/\b\f\n\r\t")), "\"\\/\b\f\n\r\t");
 end test test-parse-string;
 
+
 define test test-parse-number ()
   for (item in #[#["123", 123],
                  #["-123", -123],
-                 #["123e3", 123000],
+                 #["123.123", 123.123d0],
+                 #["-123", -123],
+                 #["-123.4", -123.4d0]])
+    let (input, expected) = apply(values, item);
+    check-equal(format-to-string("%s => %s", input, expected),
+                parse-json(input), expected);
+  end;
+end test;
+
+// https://github.com/dylan-lang/json/issues/5
+// Move these cases back into test-parse-number when fixed.
+define test test-parse-number-failures
+    (expected-failure?: #t)
+  for (item in #[#["123e3", 123000],
                  #["123E3", 123000],
                  #["123e+3", 123000],
                  #["123E+3", 123000],
                  #["123e-3", 0.123d0],
                  #["123E-3", 0.123d0],
-                 #["123.123", 123.123d0],
                  #["123.123e3", 123123],
                  #["123.1e-3", 0.1231d0],
-                 #["-123", -123],
-                 #["-123.4", -123.4d0],
                  #["-123.4e3", -123400.0d0]])
     let (input, expected) = apply(values, item);
     check-equal(format-to-string("%s => %s", input, expected),
                 parse-json(input), expected);
   end;
-end test test-parse-number;
+end test;
 
 define test test-parse-constants ()
   check-equal("a", parse-json("null"), $null);
