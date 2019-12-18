@@ -1,12 +1,11 @@
 Module: %json
 Synopsis: Ad-hoc recursive descent parser for JSON -- http://www.json.org/
-Author: Carl Gay
 Copyright: Copyright (c) 2012 Dylan Hackers.  All rights reserved.
 License:   See LICENSE.txt in this distribution for details.
 
 
 // Notes:
-// * Objects are parsed as <string-table>s.
+// * Objects are parsed as <string-table>s by default.
 // * The parser is strict by default.  If ``strict?: #f`` is used then
 //   - '#' is allowed as a comment character
 //   - "\<c>" is equivalent to "<c>", where <c> is not a defined escape character
