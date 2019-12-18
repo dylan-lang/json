@@ -1,5 +1,5 @@
 Module: json-test-suite
-Synopsis: JSON test suite
+Synopsis: Tests for the JSON parser
 Copyright: Copyright (c) 2012 Dylan Hackers.  All rights reserved.
 License: See License.txt in this distribution for details.
 
@@ -71,8 +71,7 @@ define test test-parse-constants ()
   check-condition("d", <json-error>, parse-json("null123"));
 end test test-parse-constants;
 
-/// Synopsis: Verify that whitespace (including CR, CRLF, and LF) is ignored.
-///
+// Verify that whitespace (including CR, CRLF, and LF) is ignored.
 define test test-parse-whitespace ()
   let obj = make(<string-table>);
   obj["key"] := 123;
