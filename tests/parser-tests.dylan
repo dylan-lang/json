@@ -56,10 +56,9 @@ define test test-parse-number ()
   end;
 end test;
 
-// https://github.com/dylan-lang/json/issues/5
 // Move these cases back into test-parse-number when fixed.
 define test test-parse-number-failures
-    (expected-failure?: #t)
+    (expected-to-fail-reason: "https://github.com/dylan-lang/json/issues/5")
   for (item in #[#["123e3", 123000],
                  #["123E3", 123000],
                  #["123e+3", 123000],
