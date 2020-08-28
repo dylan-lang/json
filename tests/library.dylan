@@ -5,10 +5,13 @@ License: See License.txt in this distribution for details.
 
 
 define library json-test-suite
-  use collections;
-  use common-dylan;
+  use collections,
+    import: { table-extensions };
+  use common-dylan,
+    import: { common-dylan, threads };
   use json;
-  use io;
+  use io,
+    import: { format, pprint, streams };
   use system,
     import: { locators };
   use testworks;
@@ -21,9 +24,16 @@ define module json-test-suite
     rename: { table => make-table,
               <case-insensitive-string-table> => <istring-table> };
   use json;
-  use format;
+  use format,
+    import: { format-to-string };
   use locators,
     import: { <file-locator>,
               locator-name };
+  use pprint,
+    import: { *default-line-length* };
+  use streams,
+    import: { with-output-to-string };
   use testworks;
+  use threads,
+    import: { dynamic-bind };
 end;
