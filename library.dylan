@@ -11,6 +11,7 @@ end;
 define module json
   create
     <json-error>,
+    <json-parse-error>,
 
     parse-json,
 
