@@ -28,10 +28,11 @@ end test;
 define test test-print-string ()
   assert-equal(jprint(""), #:raw:{""});
   assert-equal(jprint("a"), #:raw:{"a"});
-  assert-equal(jprint("a\nb"), #:raw:{"a\nb"});
-  assert-equal(jprint("a\tb"), #:raw:{"a\tb"});
-  assert-equal(jprint(#:raw:{a\b}), #:raw:{"a\\b"});
-  assert-equal(jprint(#:raw:{a\\c}), #:raw:{"a\\\\c"});
+  assert-equal(jprint("a\\b"), #:raw:{"a\\b"});
+  assert-equal(jprint("\0"), #:raw:{"\u0000"});
+  assert-equal(jprint("\b\f\n\r\t"), #:raw:{"\b\f\n\r\t"});
+  assert-equal(jprint("\<1f>"), #:raw:{"\u001f"});
+  assert-equal(jprint("a b"), #:raw:{"a b"});
 end test;
 
 define test test-print-sequence ()

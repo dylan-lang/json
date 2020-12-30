@@ -75,8 +75,50 @@ define method print-json (object :: <boolean>, stream :: <stream>)
 end method;
 
 define method print-json (object :: <string>, stream :: <stream>)
-  // TODO: check whether Dylan escaped string printing is compatible with json.
-  format(stream, "%=", object);
+  write-element(stream, '"');
+  let zero :: <integer> = as(<integer>, '0');
+  let a :: <integer> = as(<integer>, 'a') - 10;
+  local
+    method write-hex-digit (code :: <integer>)
+      write-element(stream, as(<character>,
+                               if (code < 10) zero + code else a + code end));
+    end,
+    method write-unicode-escape (code :: <integer>)
+      write(stream, "\\u");
+      write-hex-digit(ash(logand(code, #xf000), -12));
+      write-hex-digit(ash(logand(code, #x0f00), -8));
+      write-hex-digit(ash(logand(code, #x00f0), -4));
+      write-hex-digit(logand(code, #x000f));
+    end;
+  for (char in object)
+    let code = as(<integer>, char);
+    case
+      code <= #x1f =>
+        let escape-char = select (char)
+                            '\b' => 'b';
+                            '\f' => 'f';
+                            '\n' => 'n';
+                            '\r' => 'r';
+                            '\t' => 't';
+                            otherwise => #f;
+                          end;
+        if (escape-char)
+          write-element(stream, '\\');
+          write-element(stream, escape-char);
+        else
+          write-unicode-escape(code);
+        end;
+      char == '"' =>
+        write(stream, "\\\"");
+      char == '\\' =>
+        write(stream, "\\\\");
+      code < 127 =>             // omits DEL
+        write-element(stream, char);
+      otherwise =>
+        write-unicode-escape(code);
+    end case;
+  end for;
+  write-element(stream, '"');
 end method;
 
 define method print-json (object :: <collection>, stream :: <stream>)
