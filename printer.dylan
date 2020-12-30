@@ -29,23 +29,29 @@ Notes on pretty printing:
 define thread variable *indent* :: false-or(<string>) = #f;
 define thread variable *sort-keys?* :: <boolean> = #f;
 
-// Call this to print an object on `stream` in json format. If `indent` is
-// false `object` is printed with minimal whitespace. If `indent` is an integer
-// then use pretty printing and output `indent` spaces for each indent level.
-// If `sort-keys?` is true then output object keys in lexicographical order.
-define function print
+// Print an object in json format.
+//
+// Parameters:
+//   object: The object to print.
+//   stream: Stream on which to do output.
+//   indent: If false, `object` is printed with minimal whitespace. If an integer,
+//     then use pretty printing and output `indent` spaces for each indent level.
+//   sort-keys?: If true, output object keys in lexicographical order.
+define function print-json
     (object :: <object>, stream :: <stream>,
-     #key indent :: false-or(<integer>), sort-keys? :: <boolean>);
-  if (indent)
-    dynamic-bind (*indent* = make(<string>, size: indent, fill: ' '),
-                  *sort-keys?* = sort-keys?,
-                  *print-pretty?* = #t) // bug: shouldn't be required.
-      io/printing-logical-block(stream)
-        print-json(object, stream);
-      end;
-    end
-  else
-    print-json(object, stream);
+     #key indent :: false-or(<integer>),
+          sort-keys? :: <boolean>)
+  dynamic-bind (*sort-keys?* = sort-keys?)
+    if (indent)
+      dynamic-bind (*indent* = make(<string>, size: indent, fill: ' '),
+                    *print-pretty?* = #t) // bug: shouldn't be required.
+        io/printing-logical-block(stream)
+          do-print-json(object, stream);
+        end;
+      end
+    else
+      do-print-json(object, stream);
+    end;
   end;
 end function;
 
@@ -56,25 +62,25 @@ end function;
 //
 // If `indent:` was passed to `print` then `stream` will be a pretty printing
 // stream and the io:pprint module may be used to implement pretty printing.
-define open generic print-json (object :: <object>, stream :: <stream>);
+define open generic do-print-json (object :: <object>, stream :: <stream>);
 
-define method print-json (object == $null, stream :: <stream>)
+define method do-print-json (object == $null, stream :: <stream>)
   write(stream, "null");
 end method;
 
-define method print-json (object :: <integer>, stream :: <stream>)
+define method do-print-json (object :: <integer>, stream :: <stream>)
   write(stream, integer-to-string(object));
 end method;
 
-define method print-json (object :: <float>, stream :: <stream>)
+define method do-print-json (object :: <float>, stream :: <stream>)
   write(stream, float-to-string(object));
 end method;
 
-define method print-json (object :: <boolean>, stream :: <stream>)
+define method do-print-json (object :: <boolean>, stream :: <stream>)
   write(stream, if (object) "true" else "false" end);
 end method;
 
-define method print-json (object :: <string>, stream :: <stream>)
+define method do-print-json (object :: <string>, stream :: <stream>)
   write-element(stream, '"');
   let zero :: <integer> = as(<integer>, '0');
   let a :: <integer> = as(<integer>, 'a') - 10;
@@ -121,7 +127,7 @@ define method print-json (object :: <string>, stream :: <stream>)
   write-element(stream, '"');
 end method;
 
-define method print-json (object :: <collection>, stream :: <stream>)
+define method do-print-json (object :: <collection>, stream :: <stream>)
   io/printing-logical-block (stream, prefix: "[", suffix: "]")
     for (o in object,
          i from 0)
@@ -135,7 +141,7 @@ define method print-json (object :: <collection>, stream :: <stream>)
           io/pprint-newline(#"fill", stream);
         end;
       end if;
-      print-json(o, stream);
+      do-print-json(o, stream);
     end for;
   end;
 end method;
@@ -144,17 +150,17 @@ end method;
 // one element per line. Not sure if the pretty printer can be coaxed into
 // doing that. Might be easier to do it (even just the current functionality)
 // by hand.
-define method print-json (object :: <table>, stream :: <stream>)
+define method do-print-json (object :: <table>, stream :: <stream>)
   local
     method print-key-value-pairs-body (stream, i, key, value)
       if (i > 0)
         write(stream, ",");
         *indent* & io/pprint-newline(#"mandatory", stream);
       end if;
-      print-json(key, stream);
+      do-print-json(key, stream);
       write(stream, ":");
       *indent* & write(stream, " ");
-      print-json(value, stream);
+      do-print-json(value, stream);
     end method,
     method print-key-value-pairs (stream :: <stream>)
       if (*sort-keys?*)

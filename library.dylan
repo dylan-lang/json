@@ -15,8 +15,8 @@ define module json
 
     parse-json,
 
-    print,                      // call this
-    print-json,                 // implement this
+    print-json,                 // call this
+    do-print-json,              // implement this
 
     $null;
 end;
