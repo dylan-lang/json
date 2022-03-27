@@ -133,3 +133,47 @@ define test test-print-unsupported-type ()
   // Should be <dispatch-error> but that's not exported.
   assert-signals(<error>, jprint(make(<unsupported>)));
 end test;
+
+
+// Verify that if a do-print-json method calls print-json recursively the
+// values of dynamically bound *indent* and *sort-keys?* are preserved.
+// Unfortunately it's difficult to test the sort-keys? option fully since
+// it needs to be #t to have predictable output to compare against.
+
+define class <test-recursive-calls-to-print-json> (<object>)
+  constant slot the-table, required-init-keyword: the-table:;
+end class;
+
+define method do-print-json
+    (thing :: <test-recursive-calls-to-print-json>, stream :: <stream>)
+  // This call to print-json should match the original, top-level call to
+  // print-json in its optional arguments.
+  print-json(thing.the-table, stream)
+end method;
+
+define test test-recursive-calls-to-print-json ()
+  let thing1 = make(<test-recursive-calls-to-print-json>,
+                    the-table: make-table(1 => 2,
+                                          3 => make-table(4 => 5,
+                                                          6 => 7),
+                                          8 => 9));
+  let thing2 = make(<test-recursive-calls-to-print-json>,
+                    the-table: make-table(10 => thing1));
+  let result1 = with-output-to-string (stream)
+                  print-json(thing2, stream, sort-keys?: #t)
+                end;
+  assert-equal(#:raw:"{10:{1:2,3:{4:5,6:7},8:9}}", result1);
+  let result2 = with-output-to-string (stream)
+                  print-json(thing2, stream, sort-keys?: #t, indent: 2)
+                end;
+  assert-equal(#:raw:"{
+  10: {
+    1: 2,
+    3: {
+      4: 5,
+      6: 7
+    },
+    8: 9
+  }
+}", result2);
+end test;

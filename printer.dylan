@@ -26,7 +26,11 @@ Notes on pretty printing:
 
 */
 
+// Either #f, meaning that pretty printing is turned off, or a string
+// containing the number of spaces for ONE indent level.
 define thread variable *indent* :: false-or(<string>) = #f;
+
+// Whether to output JSON objects (i.e., tables) with keys sorted by <.
 define thread variable *sort-keys?* :: <boolean> = #f;
 
 // Print an object in json format.
@@ -40,7 +44,7 @@ define thread variable *sort-keys?* :: <boolean> = #f;
 define function print-json
     (object :: <object>, stream :: <stream>,
      #key indent :: false-or(<integer>),
-          sort-keys? :: <boolean>)
+          sort-keys? :: <boolean> = *sort-keys?*)
   dynamic-bind (*sort-keys?* = sort-keys?)
     if (indent)
       dynamic-bind (*indent* = make(<string>, size: indent, fill: ' '),
