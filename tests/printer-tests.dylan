@@ -3,7 +3,7 @@ Synopsis: Tests for the JSON printer
 
 define function jprint(object)
   with-output-to-string(s)
-    print(object, s);
+    print-json(object, s);
   end
 end function;
 
@@ -45,23 +45,23 @@ end test;
 
 define test test-pretty-print-sequence ()
   assert-equal("[]", with-output-to-string (s)
-                       print(#[], s, indent: 2);
+                       print-json(#[], s, indent: 2);
                      end);
   assert-equal("[2]", with-output-to-string (s)
-                        print(#[2], s, indent: 2);
+                        print-json(#[2], s, indent: 2);
                       end);
   assert-equal(#:raw:{["first string",
  "second string"]},
                with-output-to-string (s)
                  dynamic-bind (*default-line-length* = 20)
-                   print(#["first string", "second string"], s, indent: 2);
+                   print-json(#["first string", "second string"], s, indent: 2);
                  end;
                end);
   assert-equal(#:raw:{["one", "two", "three",
  "four", "five", "six"]},
                with-output-to-string (s)
                  dynamic-bind (*default-line-length* = 24)
-                   print(#["one", "two", "three", "four", "five", "six"], s, indent: 2);
+                   print-json(#["one", "two", "three", "four", "five", "six"], s, indent: 2);
                  end;
                end);
 end test;
@@ -77,7 +77,7 @@ end test;
 
 define test test-pretty-print-table ()
   assert-equal("{}", with-output-to-string (s)
-                       print(make-table(), s, indent: 2)
+                       print-json(make-table(), s, indent: 2)
                      end);
 
   let table
@@ -99,14 +99,14 @@ define test test-pretty-print-table ()
   }
 }];
   let got = with-output-to-string (s)
-              print(table, s, indent: 2, sort-keys?: #t)
+              print-json(table, s, indent: 2, sort-keys?: #t)
             end;
   assert-equal(got, want);
 
   // Check the unsorted output. We don't know where the commas will be so just
   // remove them and make sure all lines are present in any order.
   let got-unsorted = with-output-to-string (s)
-                       print(table, s, indent: 2, sort-keys?: #f);
+                       print-json(table, s, indent: 2, sort-keys?: #f);
                      end;
   let want-lines = map(rcurry(remove, ','), split(want, '\n'));
   let got-lines = map(rcurry(remove, ','), split(got-unsorted, '\n'));
@@ -115,7 +115,7 @@ define test test-pretty-print-table ()
 
   // Use a different indent width.
   let got3 = with-output-to-string(s)
-               print(make-table("2" => 3, "4" => 5), s, indent: 3, sort-keys?: #t);
+               print-json(make-table("2" => 3, "4" => 5), s, indent: 3, sort-keys?: #t);
              end;
   assert-equal(got3, #:raw:[{
    "2": 3,
@@ -132,4 +132,48 @@ define class <unsupported> (<object>) end;
 define test test-print-unsupported-type ()
   // Should be <dispatch-error> but that's not exported.
   assert-signals(<error>, jprint(make(<unsupported>)));
+end test;
+
+
+// Verify that if a do-print-json method calls print-json recursively the
+// values of dynamically bound *indent* and *sort-keys?* are preserved.
+// Unfortunately it's difficult to test the sort-keys? option fully since
+// it needs to be #t to have predictable output to compare against.
+
+define class <test-recursive-calls-to-print-json> (<object>)
+  constant slot the-table, required-init-keyword: the-table:;
+end class;
+
+define method do-print-json
+    (thing :: <test-recursive-calls-to-print-json>, stream :: <stream>)
+  // This call to print-json should match the original, top-level call to
+  // print-json in its optional arguments.
+  print-json(thing.the-table, stream)
+end method;
+
+define test test-recursive-calls-to-print-json ()
+  let thing1 = make(<test-recursive-calls-to-print-json>,
+                    the-table: make-table(1 => 2,
+                                          3 => make-table(4 => 5,
+                                                          6 => 7),
+                                          8 => 9));
+  let thing2 = make(<test-recursive-calls-to-print-json>,
+                    the-table: make-table(10 => thing1));
+  let result1 = with-output-to-string (stream)
+                  print-json(thing2, stream, sort-keys?: #t)
+                end;
+  assert-equal(#:raw:"{10:{1:2,3:{4:5,6:7},8:9}}", result1);
+  let result2 = with-output-to-string (stream)
+                  print-json(thing2, stream, sort-keys?: #t, indent: 2)
+                end;
+  assert-equal(#:raw:"{
+  10: {
+    1: 2,
+    3: {
+      4: 5,
+      6: 7
+    },
+    8: 9
+  }
+}", result2);
 end test;
