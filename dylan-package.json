@@ -1,0 +1,9 @@
+{
+    "name": "json",
+    "version": "1.1.0",
+    "description": "Convert to/from JSON format",
+    "keywords": ["workspace", "package"],
+    "dependencies": [ "strings@1.2.0" ],
+    "dev-dependencies": [ "testworks" ],
+    "url": "https://github.com/dylan-lang/json"
+}
