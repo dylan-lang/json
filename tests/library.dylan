@@ -21,7 +21,7 @@ define module json-test-suite
   use common-dylan;
   use table-extensions,
     import: {},
-    rename: { table => make-table,
+    rename: { tabling => make-table,
               <case-insensitive-string-table> => <istring-table> };
   use json;
   use format,
