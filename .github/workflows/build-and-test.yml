@@ -3,10 +3,14 @@ name: build-and-test
 on:
   push:
     # all branches
+    paths-ignore:
+      - 'documentation/**'
   pull_request:
     branches:
       - main
       - master
+    paths-ignore:
+      - 'documentation/**'
 
   # This enables the Run Workflow button on the Actions tab.
   workflow_dispatch:
@@ -16,11 +20,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v2
-      - uses: dylan-lang/install-opendylan@v2
+      - uses: actions/checkout@v4
+
+      - name: Install Opendylan
+        uses: dylan-lang/install-opendylan@v3
+
+      - name: Update dependencies
+        run: dylan update
 
       - name: Build json-test-suite
-        run: ./dylan-compiler -build -jobs 2 json-test-suite
+        run: dylan build json-test-suite
 
       - name: Run json-test-suite
-        run: _build/bin/json-test-suite
+        run: _build/bin/json-test-suite --progress none --report surefire > _build/TEST-json.xml
+
+      - name: Publish Test Report
+        if: success() || failure()
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: '**/_build/TEST-*.xml'
