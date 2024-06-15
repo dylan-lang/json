@@ -1,0 +1,44 @@
+name: Build and check documentation
+
+on:
+  pull_request:
+    # all branches
+    paths:
+      - 'documentation/**'
+
+  # This enables the Run Workflow button on the Actions tab.
+  workflow_dispatch:
+
+# Set DYLAN environment variable to GITHUB_WORKSPACE so packages are
+# installed in ../../_packages relative to documentation's Makefile
+env:
+  DYLAN: ${{ github.workspace }}
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check links
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/fraya/dylan-docs
+          options: -v ${{ github.workspace }}/documentation:/docs
+          run: make linkcheck
+
+      - name: Build docs with Furo theme
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/fraya/dylan-docs
+          options: -v ${{ github.workspace }}/documentation:/docs
+          run: make html
+
+      - name: Upload html artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: json
+          path: documentation/build/html/
