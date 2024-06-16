@@ -78,8 +78,14 @@ Conditions
       .. code-block:: dylan
 
         let data = """{"a": 1, "b": 2,}""";
-        let parsed = parse-json(data);
+        let parsed = parse-json(data, strict?: #f);
 	let a = parsed["a"];
+
+      `Run this example <https://play.opendylan.org/shared/89037b0be1300a55>`_
+      in https://play.opendylan.org
+
+      Note the use of ``strict?: #f`` is needed since *data* has a
+      trailing comma after the number 2.
 
 .. method:: parse-json
    :specializer: <stream>
