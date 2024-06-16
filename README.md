@@ -26,23 +26,33 @@ This library exports the following methods:
 - `parse-json` and
 - `print-json`
 
+### Parse JSON
+
 An example of usage of `parse-json`:
 
 ```dylan
-// Create a JSON string
-let json = #:raw:({
-  "a": 1,
-  "b": 2,
-});
+let json = """
+  {
+    "a": 1,
+    "b": 2
+  }
+  """;
 
-// Parse JSON to a table
 let json-table = parse-json(json);
-
 format-out("a = %d", json-table["a"]);
 ```
 
-`print-json` is used to pretty print a `table` in JSON format:
+[Run this code](https://play.opendylan.org/shared/d123253033bda66a) in
+https://play.opendylan.org
+
+### Print JSON
+
+`print-json` is used to pretty print a `table` in JSON format,
+following the previous example:
 
 ```dylan
-print-json(json-table, *standard-output*);
+print-json(json-table, *standard-output*, indent: 2);
 ```
+
+[Run a complete example](https://play.opendylan.org/shared/06af84b39fab129b) in
+https://play.opendylan.org
