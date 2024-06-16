@@ -126,7 +126,7 @@ Conditions
       whitespace. If an integer, then use pretty printing and output
       *indent* spaces for each indent level.
 
-      If `sort-keys:` is true, output object keys in lexicographical
+      If `sort-keys?:` is true, output object keys in lexicographical
       order.
 
 ``do-print-json``
