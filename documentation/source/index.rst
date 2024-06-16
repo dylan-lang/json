@@ -1,5 +1,5 @@
-Welcome to Json's documentation!
-================================
+json
+====
 
 .. current-library: json
    
