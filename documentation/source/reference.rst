@@ -107,6 +107,10 @@ Conditions
 	  ...
 	end;
 
+      `Run an example
+      <https://play.opendylan.org/shared/24c4ac32aaf6a5b5>`_ with a
+      string stream in https://play.opendylan.org
+
 ``print-json``
 --------------
 
