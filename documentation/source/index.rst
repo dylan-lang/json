@@ -15,7 +15,7 @@ interchange format that is easy for humans to read and write, and easy
 for machines to parse and generate.
 
 The json library offers two primary methods to facilitate the
-conversion between JSON strings and OpenDylan tables, making it
+conversion between JSON strings and Dylan data structures, making it
 straightforward to integrate JSON data handling into your OpenDylan
 applications. This methods are:
 
