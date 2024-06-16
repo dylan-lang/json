@@ -134,7 +134,7 @@ Conditions
 
 Override this to print your own objects in JSON format. It can be
 implemented by converting objects to built-in Dylan types (tables,
-collections, etc) and calling *print* on those objects, or by
+collections, etc) and calling *print-json* on those objects, or by
 writing json syntax directly to *stream*.
 
 If `indent:` was passed to *print* then *stream* will be a pretty
