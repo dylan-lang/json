@@ -1,4 +1,4 @@
-Json library reference
+Json Library Reference
 **********************
 
 .. current-library:: json
