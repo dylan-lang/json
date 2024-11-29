@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="json Library Reference" href="reference.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
         <title>Json 1.1.1 documentation</title>
@@ -191,7 +191,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -211,10 +211,7 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">json Library Reference</a></li>
-</ul>
-
+  
 </div>
 </div>
 
@@ -247,7 +244,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -257,32 +254,258 @@
 <h1>json<a class="headerlink" href="#json" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>This library provides essential functionality for working with JSON
-data. JSON (JavaScript Object Notation) is a lightweight data
-interchange format that is easy for humans to read and write, and easy
-for machines to parse and generate.</p>
-<p>The json library offers two primary methods to facilitate the
-conversion between JSON strings and Dylan data structures, making it
-straightforward to integrate JSON data handling into your Open Dylan
-applications. This methods are:</p>
-<dl class="simple">
-<dt><a class="reference internal" href="reference.html#json:json:parse-json"><code class="xref dylan dylan-gf docutils literal notranslate"><span class="pre">parse-json</span></code></a></dt><dd><p>This method takes a JSON-formatted string and converts it into an
-Open Dylan table. This function is useful when you need to process
-JSON data received from external sources, such as web APIs or
-configuration files.</p>
-</dd>
-<dt><a class="reference internal" href="reference.html#json:json:print-json"><code class="xref dylan dylan-gf docutils literal notranslate"><span class="pre">print-json</span></code></a></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">print-json</span></code> function takes an Open Dylan table and converts
-it into a formatted JSON string. This is useful for serializing
-Open Dylan data structures into JSON format for storage,
-transmission, or display purposes.</p>
+<p>This library provides essential functionality for working with JSON data.  JSON
+(JavaScript Object Notation) is a lightweight data interchange format that is easy for
+humans to read and write, and easy for machines to parse and generate.</p>
+<section id="the-json-module">
+<h2>The json Module<a class="headerlink" href="#the-json-module" title="Link to this heading">¶</a></h2>
+<section id="constants">
+<h3>Constants<a class="headerlink" href="#constants" title="Link to this heading">¶</a></h3>
+<dl class="dylan constant">
+<dt class="sig sig-object dylan-api dylan" id="json:json:$null">
+<span class="sig-name descname"><span class="pre">$null</span></span> <em class="property"><span class="pre">Constant</span></em><a class="headerlink" href="#json:json:$null" title="Link to this definition">¶</a></dt>
+<dd><p>When parsing, JSON’s “null” is converted to this value and when printing this value is
+printed as “null”.</p>
+</dd></dl>
+
+</section>
+<section id="conditions">
+<h3>Conditions<a class="headerlink" href="#conditions" title="Link to this heading">¶</a></h3>
+<dl class="dylan class">
+<dt class="sig sig-object dylan-api dylan" id="json:json:[json-error]">
+<span class="sig-name descname"><span class="pre">&lt;json-error&gt;</span></span> <em class="property"><span class="pre">Open</span> <span class="pre">Instantiable</span> <span class="pre">Class</span></em><a class="headerlink" href="#json:json:[json-error]" title="Link to this definition">¶</a></dt>
+<dd><p>All JSON errors are subclasses of this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Superclasses<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;format-string-condition&gt;</span></code> <a class="reference external" href="https://opendylan.org/books/drm/Condition_Classes#error"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;error&gt;</span></code></a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="dylan class">
+<dt class="sig sig-object dylan-api dylan" id="json:json:[json-parse-error]">
+<span class="sig-name descname"><span class="pre">&lt;json-parse-error&gt;</span></span> <em class="property"><span class="pre">Instantiable</span> <span class="pre">Class</span></em><a class="headerlink" href="#json:json:[json-parse-error]" title="Link to this definition">¶</a></dt>
+<dd><p>Any error signalled during parsing (except for file system errors) will be an instance
+of this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Superclasses<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#json:json:[json-error]"><code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;json-error&gt;</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<section id="parsing">
+<h3>Parsing<a class="headerlink" href="#parsing" title="Link to this heading">¶</a></h3>
+<dl class="dylan generic-function">
+<dt class="sig sig-object dylan-api dylan" id="json:json:parse-json">
+<span class="sig-name descname"><span class="pre">parse-json</span></span> <em class="property"><span class="pre">Open</span> <span class="pre">Generic</span> <span class="pre">function</span></em><a class="headerlink" href="#json:json:parse-json" title="Link to this definition">¶</a></dt>
+<dd><p>Parse JSON formatted text from the given <em>source</em>.  This is the
+main user-visible entry point for parsing.  <em>table-class</em>, if
+provided, should be a subclass of <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;table&gt;</span></code> to use when
+creating a json “object”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Signature<span class="colon">:</span></dt>
+<dd class="field-odd"><p>parse-json (source, #key strict?, table-class) =&gt; (json)</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>source</strong> – An <a class="reference external" href="https://opendylan.org/books/drm/Object_Classes#object"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code></a>.</p></li>
+<li><p><strong>strict?</strong> (<em>#key</em>) – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Simple_Object_Classes#boolean"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;boolean&gt;</span></code></a>.</p></li>
+<li><p><strong>table-class</strong> (<em>#key</em>) – Default to <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;string-table&gt;</span></code>.</p></li>
 </ul>
+</dd>
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json</strong> – A JSON <a class="reference external" href="https://opendylan.org/books/drm/Object_Classes#object"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Discussion<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>The parse is strict by default. If <code class="docutils literal notranslate"><span class="pre">strict?:</span></code> <a class="reference external" href="https://opendylan.org/books/drm/Other_Built-In_Objects_Defined#false"><code class="xref drm docutils literal notranslate"><span class="pre">#f</span></code></a> is
+used then:</p>
+<ul class="simple">
+<li><p><cite>#</cite> is allowed as a comment character</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">\&lt;c&gt;</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">&lt;c&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;c&gt;</span></code> is not a defined
+escape character.</p></li>
+<li><p>Trailing commas are allowed in arrays and objects.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:parse-json([string])">
+<span class="sig-name descname"><span class="pre">parse-json(&lt;string&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:parse-json([string])" title="Link to this definition">¶</a></dt>
+<dd><p>Parse a JSON object from a <a class="reference external" href="https://opendylan.org/books/drm/Collection_Classes#string"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;string&gt;</span></code></a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Signature<span class="colon">:</span></dt>
+<dd class="field-odd"><p>parse-json (source, #key strict?, table-class) =&gt; (json)</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>source</strong> – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Collection_Classes#string"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;string&gt;</span></code></a></p></li>
+<li><p><strong>strict?</strong> (<em>#key</em>) – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Simple_Object_Classes#boolean"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;boolean&gt;</span></code></a>. The default is <a class="reference external" href="https://opendylan.org/books/drm/Other_Built-In_Objects_Defined#true"><code class="xref drm docutils literal notranslate"><span class="pre">#t</span></code></a>.</p></li>
+<li><p><strong>table-class</strong> (<em>#key</em>) – A subclass of <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;table&gt;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json</strong> – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Object_Classes#object"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><div class="highlight-dylan notranslate"><div class="highlight"><pre><span></span><span class="k">let</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;&quot;{&quot;</span><span class="n">a</span><span class="s">&quot;: 1, &quot;</span><span class="n">b</span><span class="s">&quot;: 2,}&quot;&quot;&quot;</span><span class="p">;</span>
+<span class="k">let</span><span class="w"> </span><span class="n">parsed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parse-json</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="k">strict?:</span><span class="w"> </span><span class="l">#f</span><span class="p">);</span>
+<span class="k">let</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parsed</span><span class="p">[</span><span class="s">&quot;a&quot;</span><span class="p">];</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://play.opendylan.org/shared/89037b0be1300a55">Run this example</a>
+in <a class="reference external" href="https://play.opendylan.org">https://play.opendylan.org</a></p>
+<p>Note the use of <code class="docutils literal notranslate"><span class="pre">strict?:</span> <span class="pre">#f</span></code> is needed since <em>data</em> has a
+trailing comma after the number 2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:parse-json([stream])">
+<span class="sig-name descname"><span class="pre">parse-json(&lt;stream&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:parse-json([stream])" title="Link to this definition">¶</a></dt>
+<dd><p>Parse a JSON object from a <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;stream&gt;</span></code>.</p>
+<dl class="field-list">
+<dt class="field-odd">Signature<span class="colon">:</span></dt>
+<dd class="field-odd"><p>parse-json (source, #key strict?, table-class) =&gt; (json)</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>source</strong> – An instance of <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;stream&gt;</span></code>.</p></li>
+<li><p><strong>strict?</strong> (<em>#key</em>) – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Simple_Object_Classes#boolean"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;boolean&gt;</span></code></a>. The default is <a class="reference external" href="https://opendylan.org/books/drm/Other_Built-In_Objects_Defined#false"><code class="xref drm docutils literal notranslate"><span class="pre">#f</span></code></a>.</p></li>
+<li><p><strong>table-class</strong> (<em>#key</em>) – A subclass of <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;table&gt;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Values<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json</strong> – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Object_Classes#object"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><div class="highlight-dylan notranslate"><div class="highlight"><pre><span></span><span class="n">with-open-file</span><span class="w"> </span><span class="p">(</span><span class="n">fs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;data.json&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">let</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parse-json</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span><span class="w"> </span><span class="k">strict?:</span><span class="w"> </span><span class="l">#f</span><span class="p">);</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="k">end</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://play.opendylan.org/shared/24c4ac32aaf6a5b5">Run an example</a> with a
+string stream in <a class="reference external" href="https://play.opendylan.org">https://play.opendylan.org</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="printing">
+<h3>Printing<a class="headerlink" href="#printing" title="Link to this heading">¶</a></h3>
+<dl class="dylan function">
+<dt class="sig sig-object dylan-api dylan" id="json:json:print-json">
+<span class="sig-name descname"><span class="pre">print-json</span></span> <em class="property"><span class="pre">Function</span></em><a class="headerlink" href="#json:json:print-json" title="Link to this definition">¶</a></dt>
+<dd><p>Print an object in JSON format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Signature<span class="colon">:</span></dt>
+<dd class="field-odd"><p>print-json (object, stream, #key indent, sort-keys?) =&gt; ()</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>object</strong> – The object to print. An instance of <a class="reference external" href="https://opendylan.org/books/drm/Object_Classes#object"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code></a>.</p></li>
+<li><p><strong>stream</strong> – Stream on wich to do output. An instance of <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;stream&gt;</span></code>.</p></li>
+<li><p><strong>indent</strong> (<em>#key</em>) – <a class="reference external" href="https://opendylan.org/books/drm/Other_Built-In_Objects_Defined#false"><code class="xref drm docutils literal notranslate"><span class="pre">#f</span></code></a> or an instance of <a class="reference external" href="https://opendylan.org/books/drm/Number_Classes#integer"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;integer&gt;</span></code></a>.</p></li>
+<li><p><strong>sort-keys?</strong> (<em>#key</em>) – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Simple_Object_Classes#boolean"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;boolean&gt;</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Discussion<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">indent</span></code> is false, <em>object</em> is printed with minimal whitespace. If <code class="docutils literal notranslate"><span class="pre">indent</span></code>
+is an integer, then pretty printing is used, with <em>indent</em> spaces for each indent
+level.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">sort-keys?</span></code> is true, output object keys in lexicographical
+order.</p>
+<p>This function does some initial setup and then calls <a class="reference internal" href="#json:json:do-print-json"><code class="xref dylan dylan-gf docutils literal notranslate"><span class="pre">do-print-json</span></code></a> to print
+<code class="docutils literal notranslate"><span class="pre">object</span></code>.  <a class="reference internal" href="#json:json:do-print-json"><code class="xref dylan dylan-gf docutils literal notranslate"><span class="pre">do-print-json</span></code></a> has methods for most built-in Dylan types.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="dylan generic-function">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json">
+<span class="sig-name descname"><span class="pre">do-print-json</span></span> <em class="property"><span class="pre">Open</span> <span class="pre">Generic</span> <span class="pre">function</span></em><a class="headerlink" href="#json:json:do-print-json" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Signature<span class="colon">:</span></dt>
+<dd class="field-odd"><p>do-print-json (object, stream) =&gt; ()</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>object</strong> – An instance of <a class="reference external" href="https://opendylan.org/books/drm/Object_Classes#object"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;object&gt;</span></code></a>.</p></li>
+<li><p><strong>stream</strong> – An instance of <code class="xref dylan dylan-class docutils literal notranslate"><span class="pre">&lt;stream&gt;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Discussion<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>This method may be overridden for your own classes in order to print them in JSON
+format. Often the simplest way to implement your method will be to convert your
+object to a <a class="reference external" href="https://opendylan.org/books/drm/Collection_Classes#table"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;table&gt;</span></code></a> and then pass it to <a class="reference internal" href="#json:json:print-json"><code class="xref dylan dylan-func docutils literal notranslate"><span class="pre">print-json</span></code></a> to print it on
+<em>stream</em>.</p>
+<p>It is also possible to write JSON syntax directly to <em>stream</em>.  If <cite>indent:</cite> was
+passed to <em>print</em> then <em>stream</em> will be a pretty printing stream and the <a class="reference external" href="https://opendylan.org/library-reference/io/print.html#the-pprint-module">pprint
+module</a>
+in the IO library may be used to implement pretty printing.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json(==$null)">
+<span class="sig-name descname"><span class="pre">do-print-json(==</span> <span class="pre">$null)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:do-print-json(==$null)" title="Link to this definition">¶</a></dt>
+<dd><p>Prints “null” on the output stream.</p>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json([integer])">
+<span class="sig-name descname"><span class="pre">do-print-json(&lt;integer&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:do-print-json([integer])" title="Link to this definition">¶</a></dt>
+<dd><p>Prints an <a class="reference external" href="https://opendylan.org/books/drm/Number_Classes#integer"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;integer&gt;</span></code></a> on the output stream.</p>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json([float])">
+<span class="sig-name descname"><span class="pre">do-print-json(&lt;float&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:do-print-json([float])" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a <a class="reference external" href="https://opendylan.org/books/drm/Number_Classes#float"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;float&gt;</span></code></a> on the output stream.</p>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json([boolean])">
+<span class="sig-name descname"><span class="pre">do-print-json(&lt;boolean&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:do-print-json([boolean])" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a <a class="reference external" href="https://opendylan.org/books/drm/Simple_Object_Classes#boolean"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;boolean&gt;</span></code></a> on the output stream as “true” or “false”.</p>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json([string])">
+<span class="sig-name descname"><span class="pre">do-print-json(&lt;string&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:do-print-json([string])" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a <a class="reference external" href="https://opendylan.org/books/drm/Collection_Classes#string"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;string&gt;</span></code></a> on the output stream as a JSON compatible
+string. Specifically, this method limits the escape codes to those recognized by the
+JSON format and converts non-printable characters to Unicode escape sequences.</p>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json([collection])">
+<span class="sig-name descname"><span class="pre">do-print-json(&lt;collection&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:do-print-json([collection])" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a <a class="reference external" href="https://opendylan.org/books/drm/Collection_Classes#collection"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;collection&gt;</span></code></a> on the output stream as a JSON array.</p>
+</dd></dl>
+
+<dl class="dylan method">
+<dt class="sig sig-object dylan-api dylan" id="json:json:do-print-json([table])">
+<span class="sig-name descname"><span class="pre">do-print-json(&lt;table&gt;)</span></span> <em class="property"><span class="pre">Method</span></em><a class="headerlink" href="#json:json:do-print-json([table])" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a <a class="reference external" href="https://opendylan.org/books/drm/Collection_Classes#table"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;table&gt;</span></code></a> on the output stream as a JSON “object”.</p>
+</dd></dl>
+
+</section>
+</section>
 </section>
 
         </article>
@@ -290,15 +513,7 @@ transmission, or display purposes.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="reference.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">json Library Reference</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
+          
           
         </div>
         <div class="bottom-of-page">
@@ -318,8 +533,33 @@ transmission, or display purposes.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">json</a><ul>
+<li><a class="reference internal" href="#the-json-module">The json Module</a><ul>
+<li><a class="reference internal" href="#constants">Constants</a></li>
+<li><a class="reference internal" href="#conditions">Conditions</a></li>
+<li><a class="reference internal" href="#parsing">Parsing</a></li>
+<li><a class="reference internal" href="#printing">Printing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
