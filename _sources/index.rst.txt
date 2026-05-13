@@ -90,12 +90,16 @@ Parsing
 
       .. code-block:: dylan
 
-        let data = """{"a": 1, "b": 2,}""";
-        let parsed = parse-json(data, strict?: #f);
-	let a = parsed["a"];
+         let data = """
+           {
+             "a": 1,
+             "b": 2,
+           }
+           """;
+         let parsed = parse-json(data, strict?: #f);
+         format-out("%=, %=", parsed["a"], parsed["b"]);
 
-      `Run this example <https://play.opendylan.org/shared/89037b0be1300a55>`_
-      in https://play.opendylan.org
+      `Run this example <https://play.opendylan.org/shared/611eee83bba6d65f>`_
 
       Note the use of ``strict?: #f`` is needed since *data* has a
       trailing comma after the number 2.
@@ -115,14 +119,15 @@ Parsing
 
       .. code-block:: dylan
 
-        with-open-file (fs = "data.json")
-	  let data = parse-json(fs, strict?: #f);
-	  ...
-	end;
+         let input = """
+                     { "x": 123 }
+                     """;
+         with-input-from-string (stream = input)
+           let json = parse-json(stream, strict?: #f);
+           format-out("x is %d", json["x"]);
+         end;
 
-      `Run an example
-      <https://play.opendylan.org/shared/24c4ac32aaf6a5b5>`_ with a
-      string stream in https://play.opendylan.org
+      `Run this example <https://play.opendylan.org/shared/1817e54146dacc16>`_
 
 
 Printing
