@@ -311,7 +311,7 @@ creating a json “object”.</p>
 <dd class="field-even"><p><p>The parse is strict by default. If <code class="docutils literal notranslate"><span class="pre">strict?:</span></code> <a class="reference external" href="https://opendylan.org/books/drm/Other_Built-In_Objects_Defined#false"><code class="xref drm docutils literal notranslate"><span class="pre">#f</span></code></a> is
 used then:</p>
 <ul class="simple">
-<li><p><cite>#</cite> is allowed as a comment character</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">#</span></code> is allowed as a comment character</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">\&lt;c&gt;</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">&lt;c&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;c&gt;</span></code> is not a defined
 escape character.</p></li>
 <li><p>Trailing commas are allowed in arrays and objects.</p></li>
@@ -444,7 +444,7 @@ order.</p>
 format. Often the simplest way to implement your method will be to convert your
 object to a <a class="reference external" href="https://opendylan.org/books/drm/Collection_Classes#table"><code class="xref drm docutils literal notranslate"><span class="pre">&lt;table&gt;</span></code></a> and then pass it to <a class="reference internal" href="#json:json:print-json"><code class="xref dylan dylan-func docutils literal notranslate"><span class="pre">print-json</span></code></a> to print it on
 <em>stream</em>.</p>
-<p>It is also possible to write JSON syntax directly to <em>stream</em>.  If <cite>indent:</cite> was
+<p>It is also possible to write JSON syntax directly to <em>stream</em>.  If <code class="docutils literal notranslate"><span class="pre">indent:</span></code> was
 passed to <em>print</em> then <em>stream</em> will be a pretty printing stream and the <a class="reference external" href="https://opendylan.org/library-reference/io/print.html#the-pprint-module">pprint
 module</a>
 in the IO library may be used to implement pretty printing.</p>
