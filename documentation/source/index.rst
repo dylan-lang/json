@@ -68,7 +68,7 @@ Parsing
       The parse is strict by default. If ``strict?:`` :drm:`#f` is
       used then:
 
-      - `#` is allowed as a comment character
+      - ``#`` is allowed as a comment character
 
       - ``\<c>`` is equivalent to ``<c>``, where ``<c>`` is not a defined
         escape character.
@@ -169,7 +169,7 @@ Printing
       object to a :drm:`<table>` and then pass it to :func:`print-json` to print it on
       *stream*.
 
-      It is also possible to write JSON syntax directly to *stream*.  If `indent:` was
+      It is also possible to write JSON syntax directly to *stream*.  If ``indent:`` was
       passed to *print* then *stream* will be a pretty printing stream and the `pprint
       module <https://opendylan.org/library-reference/io/print.html#the-pprint-module>`_
       in the IO library may be used to implement pretty printing.
